@@ -7,6 +7,7 @@ node_modules
 .python-version
 .dynamodb
 package-lock.json
+.layers
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

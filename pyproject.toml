@@ -6,13 +6,13 @@ authors = ["houbie <ivo@houbrechts-it.be>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-boto3 = "^1.16.43"
 aws-lambda-powertools = "^1.9.1"
 pynamodb = "^5.0.0"
 Flask = "^1.1.2"
 connexion = "^2.7.0"
 
 [tool.poetry.dev-dependencies]
+boto3 = "^1.16.43"
 pytest = "^6.2.1"
 pytest-mock = "^3.5.1"
 locust = "^1.4.1"
