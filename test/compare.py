@@ -9,16 +9,16 @@ def collect_differences(actual, expected, path, differences):
     if isinstance(expected, list) or isinstance(expected, tuple):
         for index, expected_item in enumerate(expected):
             try:
-                collect_differences(actual[index], expected_item, f'{path}.{index}', differences)
+                collect_differences(actual[index], expected_item, path=f'{path}[{index}]', differences=differences)
             except IndexError:
                 differences.append(
-                    {'path': f'{path}.{index}', 'actual': 'index not found', 'expected': expected[index]})
+                    {'path': f'{path}[{index}]', 'actual': f'index {index} not found', 'expected': expected[index]})
         return differences
 
     if isinstance(expected, dict):
         for key, expected_value in expected.items():
-            actual_value = actual.get(key) if isinstance(actual, dict) else getattr(actual, key)
-            collect_differences(actual_value, expected_value, f'{path}.{key}', differences)
+            actual_value = actual.get(key) if isinstance(actual, dict) else getattr(actual, key, None)
+            collect_differences(actual_value, expected_value, path=f'{path}.{key}', differences=differences)
         return differences
 
     if isinstance(expected, re.Pattern):
@@ -32,5 +32,6 @@ def collect_differences(actual, expected, path, differences):
 
 
 def assert_similar(actual, expected):
-    differences = collect_differences(actual, expected, '', [])
-    assert not differences, f'found differences: {differences}'
+    differences = [f'expected{diff["path"]}: "{diff["expected"]}", actual{diff["path"]}: "{diff["actual"]}"' for diff in
+                   collect_differences(actual, expected, path='', differences=[])]
+    assert not differences, 'found {} differences:\n{}'.format(len(differences), "\n".join(differences))
