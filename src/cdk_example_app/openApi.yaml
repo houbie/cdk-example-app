@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: Cdk Example API
+  description: example AWS Python Lambda application deployed with CDK
+  version: 0.1.0
+servers:
+  - url: http://127.0.0.1:8080
+  - url: https://s0o1bq1ap7.execute-api.eu-west-1.amazonaws.com/prod
+
+paths:
+  /hello:
+    get:
+      operationId: cdk_example_app.hello_operation.hello_world
+      responses:
+        200:
+          description: say hello
+  /info:
+    get:
+      operationId: cdk_example_app.lambda_lib.connexion.application_factory.info
+      responses:
+        200:
+          description: return the application information
