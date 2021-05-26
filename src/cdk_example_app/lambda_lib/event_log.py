@@ -1,5 +1,4 @@
 import os
-import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone, timedelta
 
@@ -34,10 +33,9 @@ class EventLog(Model):
         host = os.environ.get('DYNAMODB_HOST')
         region = Session().get_config_variable("region")
 
-    id = UnicodeAttribute(hash_key=True)
-    status = UnicodeAttribute()
-    s3_key = UnicodeAttribute(attr_name='key')
+    s3_key = UnicodeAttribute(hash_key=True)
     s3_bucket = UnicodeAttribute(attr_name='bucket')
+    status = UnicodeAttribute()
     gzip = BooleanAttribute(default=False)
     function = UnicodeAttribute()
     region = UnicodeAttribute()
@@ -78,7 +76,6 @@ def event_log(s3_bucket: str, s3_key: str, function_name: str, logger: Logger) -
     logger.append_keys(s3_bucket=s3_bucket, s3_key=s3_key)
     logger.debug(f"processing s3 event")
     log = EventLog(
-        id=str(uuid.uuid4()),
         status=STATUS_PROCESSING,
         s3_key=s3_key,
         s3_bucket=s3_bucket,

@@ -3,7 +3,7 @@ import os
 from aws_lambda_powertools import Logger
 from opentelemetry import propagate, trace
 from opentelemetry.instrumentation.botocore import BotocoreInstrumentor
-from opentelemetry.propagators.b3 import B3Format
+from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.sdk.resources import Resource, SERVICE_NAME
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
@@ -33,5 +33,5 @@ trace_provider.add_span_processor(LoggerContextSimpleExportSpanProcessor(logger_
 trace.set_tracer_provider(trace_provider)
 tracer: Tracer = trace.get_tracer(__name__)
 
-propagate.set_global_textmap(B3Format())
+propagate.set_global_textmap(B3MultiFormat())
 BotocoreInstrumentor().instrument()

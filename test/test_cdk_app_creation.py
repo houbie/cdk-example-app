@@ -16,5 +16,5 @@ def search_resource(resources, key_prefix, type):
 
 def test_hello_lambda_created():
     resources = get_template()['Resources']
-    assert search_resource(resources, 'HelloHandler', 'AWS::Lambda::Function')
+    assert search_resource(resources, 'ApiHandler', 'AWS::Lambda::Function')
     assert search_resource(resources, 'CdkExampleApi', 'AWS::ApiGateway::RestApi')

@@ -8,11 +8,9 @@ logger = Logger(service='event-log-test')
 
 def test_with_event_log(event_log_table):
     with event_log('my-bucket', 'my-key', 'my-lambda', logger) as event_log_:
-        log_id = event_log_.id
         event_log_.set_functional_key('funky', 'music')
 
-    assert_similar(EventLog.get(log_id).attribute_values, {
-        'id': log_id,
+    assert_similar(EventLog.get('my-key').attribute_values, {
         'function': 'my-lambda',
         's3_bucket': 'my-bucket',
         's3_key': 'my-key',
@@ -27,19 +25,17 @@ def test_with_event_log(event_log_table):
 
 def test_with_event_log_raising_exception(event_log_table):
     try:
-        with event_log('my-bucket', 'my-key', 'my-lambda', logger) as event_log_:
-            log_id = event_log_.id
+        with event_log('my-bucket', 'my-error-key', 'my-lambda', logger) as event_log_:
             event_log_.set_functional_key('funky', 'music')
             raise ValueError('my-error')
         assert False
     except ValueError:
         assert True
 
-    assert_similar(EventLog.get(log_id).attribute_values, {
-        'id': log_id,
+    assert_similar(EventLog.get('my-error-key').attribute_values, {
         'function': 'my-lambda',
         's3_bucket': 'my-bucket',
-        's3_key': 'my-key',
+        's3_key': 'my-error-key',
         'functional_key_name': 'funky',
         'functional_key_value': 'music',
         'gzip': False,
