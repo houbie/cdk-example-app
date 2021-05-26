@@ -22,6 +22,10 @@ def test_assert_similar_list():
         assert_similar({2: 'two'}, {1: 'one', 2: 'two'})
 
 
+def test_assert_similar_with_callable():
+    assert_similar([1, 'two', 3], [1, 'two', (str, '3')])
+
+
 def test_assert_similar_nested():
     class C:
         def __init__(self):

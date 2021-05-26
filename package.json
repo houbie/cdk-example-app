@@ -2,6 +2,6 @@
   "name": "cdk-example-app",
   "version": "0.1.0",
   "devDependencies": {
-    "aws-cdk": "^1.102.0"
+    "aws-cdk": "^1.105.0"
   }
 }

@@ -6,6 +6,10 @@ ignore = object()
 def collect_differences(actual, expected, path, differences):
     if expected == ignore:
         return differences
+
+    if isinstance(expected, tuple) and len(expected) == 2 and callable(expected[0]):
+        return collect_differences(expected[0](actual), expected[1], path=path, differences=differences)
+
     if isinstance(expected, list) or isinstance(expected, tuple):
         for index, expected_item in enumerate(expected):
             try:

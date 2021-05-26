@@ -9,6 +9,7 @@ from aws_cdk import (
 )
 
 from cdk_lib.api_gw import RestApi
+from cdk_lib.event_log import event_log_table
 from cdk_lib.lambda_function import lambda_function, s3_event_handler
 from cdk_lib.stack import PythonStack
 
@@ -27,10 +28,13 @@ class ApplicationStack(PythonStack):
     def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        event_log = event_log_table(self)
+
         hello_lambda = lambda_function(self, 'hello')
 
         events_bucket = aws_s3.Bucket(self, "EventsBucket", bucket_name=get_bucket_name())
-        s3_event_handler(self, 'S3IntegrationEvent', events_bucket, s3_key_prefix=S3_EVENT_PATH)
+        s3_event_handler(self, 'S3IntegrationEvent', events_bucket,
+                         s3_key_prefix=S3_EVENT_PATH, event_log_table=event_log)
 
         apigw = RestApi(self, 'CdkExampleApi')
         apigw.root.add_proxy(default_integration=aws_apigateway.LambdaIntegration(hello_lambda))

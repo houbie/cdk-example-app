@@ -1,8 +1,10 @@
 import re
 from dataclasses import dataclass
+from io import BytesIO
 from unittest.mock import Mock
 
 import pytest
+from botocore.response import StreamingBody
 from opentelemetry.trace import SpanKind, format_trace_id
 
 import cdk_example_app.lambda_lib.s3 as s3
@@ -20,11 +22,14 @@ class Context:
 
 @pytest.fixture
 def create_event_handler(event_log_table):
+    def functional_key_extractor(body):
+        return 'func_key', str(body)
+
     def create(parse_json=True):
         handler_args = []
         logger = Mock()
 
-        @s3.s3_event_handler(logger, parse_json=parse_json)
+        @s3.s3_event_handler(logger, parse_json=parse_json, functional_key_extractor=functional_key_extractor)
         def handler(body, s3_obj, record):
             if 'handler-error' in record['s3']['object']['key']:
                 raise Exception(record['s3']['object']['key'])
@@ -54,11 +59,11 @@ def s3_get_object_mock(mocker):
             }
         if 'json' in Key:
             return {
-                'Body': b'{"foo":"bar"}',
+                'Body': streaming_body(b'{"foo":"bar"}'),
                 'Metadata': metadata
             }
         return {
-            'Body': b'foo bar',
+            'Body': streaming_body(b'foo bar'),
             'Metadata': metadata
         }
 
@@ -86,10 +91,10 @@ def test_s3_event_handler(create_event_handler, s3_get_object_mock, create_s3_ev
     event = create_s3_event(['my-key'])
     handler(event, Context(function_name='my-lambda'))
 
-    assert handler_args == [{'body': 'foo bar',
-                             'record': {'s3': {'bucket': {'name': 'my-bucket'},
-                                               'object': {'key': 'my-key'}}},
-                             's3_obj': {'Body': b'foo bar', 'Metadata': {}}}]
+    assert_similar(handler_args, [{'body': 'foo bar',
+                                   'record': {'s3': {'bucket': {'name': 'my-bucket'},
+                                                     'object': {'key': 'my-key'}}},
+                                   's3_obj': {'Body': (type, StreamingBody), 'Metadata': {}}}])
     s3_get_object_mock.assert_called_once_with(Bucket='my-bucket', Key='my-key')
 
 
@@ -98,10 +103,10 @@ def test_json_s3_event_handler(create_event_handler, s3_get_object_mock, create_
     event = create_s3_event(['my-json-key'])
     handler(event, Context(function_name='my-lambda'))
 
-    assert handler_args == [{'body': {'foo': 'bar'},
-                             'record': {'s3': {'bucket': {'name': 'my-bucket'},
-                                               'object': {'key': 'my-json-key'}}},
-                             's3_obj': {'Body': b'{"foo":"bar"}', 'Metadata': {}}}]
+    assert_similar(handler_args, [{'body': {'foo': 'bar'},
+                                   'record': {'s3': {'bucket': {'name': 'my-bucket'},
+                                                     'object': {'key': 'my-json-key'}}},
+                                   's3_obj': {'Body': (type, StreamingBody), 'Metadata': {}}}])
     s3_get_object_mock.assert_called_once_with(Bucket='my-bucket', Key='my-json-key')
 
 
@@ -120,7 +125,8 @@ def test_s3_event_handler_trace_propagation(create_event_handler, s3_get_object_
                                         'Expecting value: line 1 column 1 (char 0)'
 
     span_2 = trace_export.call_args_list[1].args[0][0]
-    assert span_2.attributes == {'s3Bucket': 'my-bucket', 's3Key': 'my-json-key-with-trace'}
+    assert span_2.attributes == {'s3Bucket': 'my-bucket', 's3Key': 'my-json-key-with-trace',
+                                 'func_key': "{'foo': 'bar'}"}
     assert format_trace_id(span_2.context.trace_id) == TRACE_ID
     assert span_2.kind == SpanKind.SERVER
     assert span_2.status.is_ok
@@ -171,6 +177,7 @@ def test_s3_event_handler_logging(create_event_handler, s3_get_object_mock, crea
         ('append_keys', ignore, {'s3_bucket': 'my-bucket', 's3_key': 'my-json-key-with-trace'}),
         ('debug', ('processing s3 event',)),
         ('append_keys', ignore, {'traceId': TRACE_ID}),
+        ('append_keys', ignore, {'func_key': "{'foo': 'bar'}"}),
         ('info', ('processed s3 object',))
     ])
 
@@ -236,3 +243,10 @@ def test_s3_event_handler_with_handler_exception(create_event_handler, s3_get_ob
         'error': 'my-json-key-with-handler-error-and-trace',
         'trace_id': TRACE_ID,
     })
+
+
+def streaming_body(raw):
+    return StreamingBody(
+        BytesIO(raw),
+        len(raw)
+    )
