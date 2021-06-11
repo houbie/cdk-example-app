@@ -4,6 +4,7 @@ package-lock.json
 *.egg-info
 node_modules
 .idea
+*.iml
 .python-version
 .dynamodb
 package-lock.json
