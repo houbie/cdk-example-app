@@ -7,7 +7,7 @@ from opentelemetry.propagators.b3 import B3Format
 from opentelemetry.propagators.textmap import Getter
 from opentelemetry.trace import SpanKind, Span
 
-from cdk_example_app.lambda_lib.tracing import tracer
+from cdk_example_app.common.tracing import tracer
 
 
 def _message_attribute_setter(message_attributes, key, value):

@@ -16,7 +16,7 @@ paths:
           description: say hello
   /info:
     get:
-      operationId: cdk_example_app.lambda_lib.connexion.application_factory.info
+      operationId: cdk_example_app.common.connexion.application_factory.info
       responses:
         200:
           description: return the application information

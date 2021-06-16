@@ -7,8 +7,8 @@ import pytest
 from botocore.response import StreamingBody
 from opentelemetry.trace import SpanKind, format_trace_id
 
-import cdk_example_app.lambda_lib.s3 as s3
-from cdk_example_app.lambda_lib.event_log import EventLog, STATUS_DONE, STATUS_FAILED
+import cdk_example_app.common.s3 as s3
+from cdk_example_app.common.event_log import EventLog, STATUS_DONE, STATUS_FAILED
 from test.compare import assert_similar, ignore
 
 TRACE_ID = '80f198ee56343ba864fe8b2a57d3eff7'
@@ -42,7 +42,7 @@ def create_event_handler(event_log_table):
 
 @pytest.fixture
 def s3_get_object_mock(mocker):
-    s3_client = mocker.patch('cdk_example_app.lambda_lib.s3.s3_client')
+    s3_client = mocker.patch('cdk_example_app.common.s3.s3_client')
     get_object = s3_client.return_value.get_object
 
     def respond(Bucket, Key):
@@ -111,7 +111,7 @@ def test_json_s3_event_handler(create_event_handler, s3_get_object_mock, create_
 
 
 def test_s3_event_handler_trace_propagation(create_event_handler, s3_get_object_mock, create_s3_event, mocker):
-    trace_export = mocker.patch('cdk_example_app.lambda_lib.tracing.tracer.logger_span_exporter.export')
+    trace_export = mocker.patch('cdk_example_app.common.tracing.tracer.logger_span_exporter.export')
     handler, handler_args, _ = create_event_handler()
     event = create_s3_event(['my-key-with-parse-error', 'my-json-key-with-trace'])
     handler(event, Context(function_name='my-lambda'))

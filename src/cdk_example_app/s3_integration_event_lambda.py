@@ -1,6 +1,6 @@
 from aws_lambda_powertools import Logger
 
-from cdk_example_app.lambda_lib.s3 import s3_event_handler
+from cdk_example_app.common.s3 import s3_event_handler
 
 logger = Logger()
 

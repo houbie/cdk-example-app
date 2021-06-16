@@ -9,7 +9,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.trace import Tracer, format_trace_id
 
-from cdk_example_app.lambda_lib.tracing.logger_span_exporter import LoggerSpanExporter
+from cdk_example_app.common.tracing.logger_span_exporter import LoggerSpanExporter
 
 TRACER_SERVICE_NAME_ENV_VARIABLE = 'TRACER_SERVICE_NAME'
 

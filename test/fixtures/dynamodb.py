@@ -3,10 +3,8 @@ import tarfile
 
 import pytest
 import requests
+from cdk_example_app.common.event_log import EventLog
 from pytest_dynamodb import factories
-from pytest_dynamodb.port import get_port
-
-from cdk_example_app.lambda_lib.event_log import EventLog
 
 
 def download_dynamodb_local(target_dir):
@@ -25,14 +23,13 @@ def download_dynamodb_local(target_dir):
 dynamo_dir = os.path.join(os.path.dirname(__file__), "../../.dynamodb")
 if not os.path.exists(f"{dynamo_dir}/DynamoDBLocal.jar"):
     download_dynamodb_local(dynamo_dir)
-# find a free port and start local dynamodb
-port = get_port(None)
-dynamodb_proc = factories.dynamodb_proc(dynamo_dir, port=port)
+
+dynamodb_proc = factories.dynamodb_proc(dynamo_dir)
 
 
 @pytest.fixture
 def event_log_table(dynamodb):
-    EventLog.Meta.host = f"http://localhost:{port}"
-    EventLog.create_table(read_capacity_units=100, write_capacity_units=100, wait=True)
+    EventLog.Meta.host = dynamodb.meta.client.meta.endpoint_url
+    EventLog.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
     yield dynamodb
     EventLog.delete_table()  # TODO: this should not be necessary

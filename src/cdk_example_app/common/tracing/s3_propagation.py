@@ -5,7 +5,7 @@ from functools import wraps
 from opentelemetry import propagate
 from opentelemetry.trace import SpanKind, Span
 
-from cdk_example_app.lambda_lib.tracing.tracer import tracer
+from cdk_example_app.common.tracing.tracer import tracer
 
 
 def s3_trace_propagator(func):

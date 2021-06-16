@@ -7,7 +7,7 @@ from typing import Callable
 import boto3
 from aws_lambda_powertools import Logger
 
-from cdk_example_app.lambda_lib.tracing.sqs_propagation import sqs_trace_propagator, start_sqs_root_span
+from cdk_example_app.common.tracing.sqs_propagation import sqs_trace_propagator, start_sqs_root_span
 
 logger = Logger()
 

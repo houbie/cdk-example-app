@@ -1,6 +1,6 @@
 from aws_lambda_powertools import Logger
 
-from cdk_example_app.lambda_lib.event_log import event_log, EventLog
+from cdk_example_app.common.event_log import event_log, EventLog
 from test.compare import assert_similar
 
 logger = Logger(service='event-log-test')

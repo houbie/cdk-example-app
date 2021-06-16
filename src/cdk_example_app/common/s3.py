@@ -7,8 +7,8 @@ import boto3
 from aws_lambda_powertools import Logger
 from opentelemetry.trace import Status, StatusCode, format_trace_id
 
-from cdk_example_app.lambda_lib.event_log import event_log
-from cdk_example_app.lambda_lib.tracing.s3_propagation import start_s3_root_span
+from cdk_example_app.common.event_log import event_log
+from cdk_example_app.common.tracing.s3_propagation import start_s3_root_span
 
 
 @lru_cache

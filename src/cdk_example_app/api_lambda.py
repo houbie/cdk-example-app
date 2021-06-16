@@ -2,7 +2,7 @@
 
 import serverless_wsgi
 
-from cdk_example_app.lambda_lib.connexion.application_factory import create_app
+from cdk_example_app.common.connexion.application_factory import create_app
 
 app = create_app(__name__, 'openApi.yaml').app
 
