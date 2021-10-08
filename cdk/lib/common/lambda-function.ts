@@ -1,11 +1,11 @@
-import {Function, Runtime} from "@aws-cdk/aws-lambda";
-import {Duration, Stack} from "@aws-cdk/core";
-import {kebab, snake, title} from "./string-utils";
-import {FunctionProps} from "@aws-cdk/aws-lambda/lib/function";
-import {PythonStack} from "./stack";
-import {Table} from "@aws-cdk/aws-dynamodb";
-import {Bucket, EventType, NotificationKeyFilter} from "@aws-cdk/aws-s3";
-import {LambdaDestination} from "@aws-cdk/aws-s3-notifications";
+import {Function, Runtime} from "@aws-cdk/aws-lambda"
+import {Duration, Stack} from "@aws-cdk/core"
+import {kebab, snake, title} from "./string-utils"
+import {FunctionProps} from "@aws-cdk/aws-lambda/lib/function"
+import {PythonStack} from "./stack"
+import {Table} from "@aws-cdk/aws-dynamodb"
+import {Bucket, EventType, NotificationKeyFilter} from "@aws-cdk/aws-s3"
+import {LambdaDestination} from "@aws-cdk/aws-s3-notifications"
 
 const DEFAULT_RUNTIME = Runtime.PYTHON_3_8
 

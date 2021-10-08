@@ -13,21 +13,21 @@ from cdk_example_app.common.tracing.s3_propagation import start_s3_root_span
 
 @lru_cache
 def s3_client():
-    return boto3.client('s3')
+    return boto3.client("s3")
 
 
 def get_json(bucket: str, key: str) -> object:
     s3_obj = s3_client().get_object(Bucket=bucket, Key=key)
-    return json.load(s3_obj['Body']), s3_obj["Metadata"]
+    return json.load(s3_obj["Body"]), s3_obj["Metadata"]
 
 
 def s3_event_handler(logger: Logger, functional_key_extractor: Callable = None, parse_json=False) -> Callable:
     def decorator(func: Callable):
         @wraps(func)
         def wrapper(event, context):
-            for record in event['Records']:
-                s3_bucket = record['s3']['bucket']['name']
-                s3_key = record['s3']['object']['key']
+            for record in event["Records"]:
+                s3_bucket = record["s3"]["bucket"]["name"]
+                s3_key = record["s3"]["object"]["key"]
 
                 with event_log(s3_bucket, s3_key, context.function_name, logger) as event_log_:
                     s3_obj = s3_client().get_object(Bucket=s3_bucket, Key=s3_key)
@@ -38,14 +38,14 @@ def s3_event_handler(logger: Logger, functional_key_extractor: Callable = None, 
                         # TODO: gzip support
                         if parse_json:
                             try:
-                                body = json.loads(s3_obj['Body'].read())
+                                body = json.loads(s3_obj["Body"].read())
                             except JSONDecodeError as e:
-                                msg = f'S3 object {s3_key} in bucket {s3_bucket} is not valid Json: {e}'
+                                msg = f"S3 object {s3_key} in bucket {s3_bucket} is not valid Json: {e}"
                                 event_log_.mark_failed(msg)
                                 span.set_status(Status(StatusCode.ERROR, msg))
                                 continue
                         else:
-                            body = s3_obj['Body'].read().decode(s3_obj.get('ContentEncoding', 'utf-8'))
+                            body = s3_obj["Body"].read().decode(s3_obj.get("ContentEncoding", "utf-8"))
 
                         if functional_key_extractor:
                             functional_key_name, functional_key_value = functional_key_extractor(body)
@@ -59,7 +59,3 @@ def s3_event_handler(logger: Logger, functional_key_extractor: Callable = None, 
         return wrapper
 
     return decorator
-
-
-def foo():
-    return s3_client().get_object(Bucket='s3_bucket', Key='s3_key')

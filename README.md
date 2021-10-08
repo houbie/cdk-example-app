@@ -3,7 +3,7 @@
 An AWS lambda application written in Python that you can deploy with the [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html).
 
 **I want to share my learnings by making this a public git repo. Please also share your thoughts, comments, improvements
-by creating issues, pull requests ... !** 
+by creating issues, pull requests ... !**
 
 ## Why CDK
 Tools I used to manage AWS infrastructure:
@@ -29,7 +29,7 @@ Tools I used to manage AWS infrastructure:
     * Will it be deprecated in favor of CDK?
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html)
   * AWS only
-  * Written in Typescript with optional Python and Java wrappers 
+  * Written in Typescript with optional Python and Java wrappers
     * I started with the Python CDK, but switched to Typescript
       * Nodejs/Npm is required anyway because the Python code invokes the Nodejs implementation
       * Better typing / code completion in Typescript
@@ -37,7 +37,7 @@ Tools I used to manage AWS infrastructure:
   * Ideal when you want to reuse architectural patterns, naming conventions, etc. across multiple projects
     * Everything inside [cdk/lib/common](cdk/lib/common) could be the basis for a reusable CDK library
   * Unit test your infrastructure code
-  
+
 ## Used concepts
 I created this repo to experiment with multiple concepts at the same time:
 * Using CDK for Python AWS Lambda's
@@ -63,10 +63,14 @@ I created this repo to experiment with multiple concepts at the same time:
 
 ## Build project
 
-We use [poetry](https://python-poetry.org/) for dependency management.  See the section about _Managing your Python setup_.
+We use [poetry](https://python-poetry.org/) for dependency management
+and [Python Wraptor](https://github.com/houbie/python-wraptor) scripts to bootstrap tool installations.
+
+Python 3.8+ needs to be on your path.
 
 ```shell
-poetry install
+./pw poetry install
+./pw test
 ```
 
 ## Deploy to AWS
@@ -89,7 +93,7 @@ Try to invoke the app (replace _your-api-gw_ and _region):
   * check the cloudwatch logs of the _s3-integration-event-fn_ for the result
 
 
-All generated infrastructure is within the (almost) free tier. 
+All generated infrastructure is within the (almost) free tier.
 
 ## Run locally
 
@@ -120,17 +124,3 @@ npx cdk destroy
 ## Intellij / Pycharm
 
 With the _AWS Toolkit_ plugin, you can view/update lambda's, S3 files, cloudwatch logs...
-
-## Managing your Python setup
-
-There are lots of ways to install Python and the required tools.
-I had the best experience by installing _pyenv_ and _Poetry_ directly on my dev machine:
-* Install _pyenv_ via HomeBrew or the [installer](https://github.com/pyenv/pyenv-installer) (or the [Windows version](https://github.com/pyenv-win/pyenv-win))
-* Install [Poetry](https://python-poetry.org/docs/#installation)
-
-Install the Python version that you want to use for your Lambdas (3.8.10 at the time of writing):
-```shell
-pyenv install 3.8.10
-cd cdk-example-app
-pyenv local 3.8.10
-```

@@ -1,9 +1,9 @@
-import typing
 from contextlib import contextmanager
 from functools import wraps
+from typing import Iterator
 
 from opentelemetry import propagate
-from opentelemetry.trace import SpanKind, Span
+from opentelemetry.trace import Span, SpanKind
 
 from cdk_example_app.common.tracing.tracer import tracer
 
@@ -18,15 +18,17 @@ def s3_trace_propagator(func):
 
 
 @contextmanager
-def start_s3_root_span(name: str,
-                       s3_obj,
-                       s3_bucket: str,
-                       s3_key: str,
-                       kind: SpanKind = SpanKind.SERVER,
-                       end_on_exit: bool = True,
-                       **kwargs) -> typing.Iterator['Span']:
-    ctx = propagate.extract(s3_obj["Metadata"])
+def start_s3_root_span(
+    name: str,
+    s3_metadata: dict,
+    s3_bucket: str,
+    s3_key: str,
+    kind: SpanKind = SpanKind.SERVER,
+    end_on_exit: bool = True,
+    **kwargs
+) -> Iterator[Span]:
+    ctx = propagate.extract(s3_metadata)
     with tracer.start_as_current_span(name, context=ctx, kind=kind, end_on_exit=end_on_exit, **kwargs) as span:
-        span.set_attribute('s3Bucket', s3_bucket)
-        span.set_attribute('s3Key', s3_key)
+        span.set_attribute("s3Bucket", s3_bucket)
+        span.set_attribute("s3Key", s3_key)
         yield span

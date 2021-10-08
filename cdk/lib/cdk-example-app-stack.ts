@@ -1,11 +1,11 @@
 import * as cdk from '@aws-cdk/core'
 import {RemovalPolicy} from '@aws-cdk/core'
-import {RestApiWithDefaults} from "./common/api-gw";
-import {LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import {createEventLogTable} from "./common/event-log";
-import {createPythonLambda, createS3EventHandler} from "./common/lambda-function";
-import {PythonStack} from "./common/stack";
-import {Bucket} from "@aws-cdk/aws-s3";
+import {RestApiWithDefaults} from "./common/api-gw"
+import {LambdaIntegration} from "@aws-cdk/aws-apigateway"
+import {createEventLogTable} from "./common/event-log"
+import {createPythonLambda, createS3EventHandler} from "./common/lambda-function"
+import {PythonStack} from "./common/stack"
+import {Bucket} from "@aws-cdk/aws-s3"
 
 const S3_EVENT_PATH = 's3-integration-event'
 

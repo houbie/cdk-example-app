@@ -1,18 +1,23 @@
 import os
 from contextlib import contextmanager
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 from aws_lambda_powertools import Logger
 from botocore.session import Session
-from pynamodb.attributes import UnicodeAttribute, UTCDateTimeAttribute, BooleanAttribute, TTLAttribute
-from pynamodb.indexes import GlobalSecondaryIndex, AllProjection
+from pynamodb.attributes import (
+    BooleanAttribute,
+    TTLAttribute,
+    UnicodeAttribute,
+    UTCDateTimeAttribute,
+)
+from pynamodb.indexes import AllProjection, GlobalSecondaryIndex
 from pynamodb.models import Model
 
 EVENT_LOG_TTL = timedelta(days=1)
 
-STATUS_PROCESSING = 'PROCESSING'
-STATUS_DONE = 'DONE'
-STATUS_FAILED = 'FAILED'
+STATUS_PROCESSING = "PROCESSING"
+STATUS_DONE = "DONE"
+STATUS_FAILED = "FAILED"
 
 
 class StatusIndex(GlobalSecondaryIndex):
@@ -30,11 +35,9 @@ class EventLog(Model):
 
     class Meta:
         table_name = os.environ.get("EVENT_LOG_TABLE", "event-log")
-        host = os.environ.get('DYNAMODB_HOST')
-        region = Session().get_config_variable("region")
 
     s3_key = UnicodeAttribute(hash_key=True)
-    s3_bucket = UnicodeAttribute(attr_name='bucket')
+    s3_bucket = UnicodeAttribute(attr_name="bucket")
     status = UnicodeAttribute()
     gzip = BooleanAttribute(default=False)
     function = UnicodeAttribute()
@@ -58,8 +61,8 @@ class EventLog(Model):
             self.processed_time = datetime.now(timezone.utc)
             self.status = STATUS_DONE
             self.save()
-            if getattr(self, 'logger'):
-                self.logger.info('processed s3 object')
+            if self.logger:
+                self.logger.info("processed s3 object")
 
     def mark_failed(self, error: str):
         if not self.processed_time:
@@ -67,29 +70,30 @@ class EventLog(Model):
             self.error = str(error)
             self.status = STATUS_FAILED
             self.save()
-            if getattr(self, 'logger'):
-                self.logger.warning(f'processing s3 object failed: {error}')
+            if self.logger:
+                self.logger.warning(f"processing s3 object failed: {error}")
 
 
 @contextmanager
 def event_log(s3_bucket: str, s3_key: str, function_name: str, logger: Logger) -> EventLog:
     logger.append_keys(s3_bucket=s3_bucket, s3_key=s3_key)
-    logger.debug(f"processing s3 event")
+    logger.debug("processing s3 event")
     log = EventLog(
         status=STATUS_PROCESSING,
         s3_key=s3_key,
         s3_bucket=s3_bucket,
         function=function_name,
-        region=os.environ.get('AWS_REGION', 'no region set'),
+        region=os.environ.get("AWS_REGION", "eu-west-1"),
         received_time=datetime.now(timezone.utc),  # TODO get from s3 record
     )
+    # pylint: disable=attribute-defined-outside-init
     log.logger = logger
     log.save()
     try:
         yield log
         log.mark_processed()
     except Exception as e:
-        if logger.log_level == 'DEBUG':
-            logger.exception(f"error processing s3 object")
+        if logger.log_level == "DEBUG":
+            logger.exception("error processing s3 object")
         log.mark_failed(str(e))
         raise

@@ -2,8 +2,8 @@ import {Construct, Stack, StackProps} from "@aws-cdk/core"
 import {AssetCode, Code, LayerVersion} from "@aws-cdk/aws-lambda"
 import * as fs from "fs"
 import * as child_process from "child_process"
-import * as path from "path";
-import * as crypto from "crypto";
+import * as path from "path"
+import * as crypto from "crypto"
 
 export class PythonStack extends Stack {
     private readonly projectDir: string
@@ -24,7 +24,7 @@ export class PythonStack extends Stack {
             fs.mkdirSync(layersDir)
         }
 
-        const stdout = child_process.execSync('poetry export --with-credentials --without-hashes', {encoding: 'utf8'})
+        const stdout = child_process.execSync('../pw poetry export --with-credentials --without-hashes', {encoding: 'utf8'})
         let requirementsArray = stdout.match(/[^\r\n]+/g) || []
         requirementsArray = requirementsArray.filter(line => !line.startsWith('boto'))
         const requirements = requirementsArray.join('\n')

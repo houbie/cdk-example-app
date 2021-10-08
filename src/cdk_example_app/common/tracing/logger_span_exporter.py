@@ -5,7 +5,8 @@ from opentelemetry.sdk.trace import Span
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 from opentelemetry.trace import format_span_id, format_trace_id
 
-logger = Logger(service='span-exporter')
+logger = Logger(service="span-exporter")
+TYPE_DISTRIBUTED_TRACING = "_DIST_TRACING_DATA_"
 
 
 class LoggerSpanExporter(SpanExporter):
@@ -16,21 +17,19 @@ class LoggerSpanExporter(SpanExporter):
             ctx = span.get_span_context()
             span_parent = getattr(span, "parent", None)
             msg = {
+                "type": TYPE_DISTRIBUTED_TRACING,
                 "name": span.name,
                 "kind": span.kind,
                 "parentSpanId": format_span_id(span_parent.span_id) if span_parent else None,
                 "context": {
                     "spanId": format_span_id(ctx.span_id),
                     "traceId": format_trace_id(ctx.trace_id),
-                    "sampled": ctx.trace_flags.sampled
+                    "sampled": ctx.trace_flags.sampled,
                 },
                 "startTimestamp": span.start_time,
                 "endTimestamp": span.end_time,
                 "attributes": span.attributes,
-                "status": {
-                    "code": span.status.status_code,
-                    "description": span.status.description
-                }
+                "status": {"code": span.status.status_code, "description": span.status.description},
             }
             logger.info(msg)
         return SpanExportResult.SUCCESS

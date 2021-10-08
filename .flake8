@@ -1,0 +1,28 @@
+[flake8]
+# B = bugbear
+# E = pycodestyle errors
+# F = flake8 pyflakes
+# W = pycodestyle warnings
+# B9 = bugbear opinions
+# ISC = implicit-str-concat
+extend-select = B, B9, ISC
+extend-ignore =
+#  false positive on whitespace
+    E203
+#  line length, handled by black
+    E501
+#  use @pytest.fixture without brackets
+    PT001
+#   N815: ignore camelcase variable naming (checked by pylint)
+    N815
+
+max-line-length = 120
+
+per-file-ignores =
+#   S101: ignore usage of assert in tests
+#   S105: Possible hardcoded password
+#   S307: use of eval
+    tests/**: S101, S105
+    tests/pytest_utils.py: S307, S101
+    tests/cdk_example_app/common/test_event_log.py: PT012
+    tests/cdk_example_app/common/test_s3.py: N803, S101

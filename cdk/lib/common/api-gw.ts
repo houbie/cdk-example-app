@@ -1,8 +1,8 @@
 import {AwsIntegration, EndpointType, IntegrationOptions, PassthroughBehavior, RestApi} from "@aws-cdk/aws-apigateway"
 import {Bucket} from "@aws-cdk/aws-s3"
 import {Role, ServicePrincipal} from "@aws-cdk/aws-iam"
-import {RestApiProps} from "@aws-cdk/aws-apigateway/lib/restapi";
-import {Construct} from "@aws-cdk/core";
+import {RestApiProps} from "@aws-cdk/aws-apigateway/lib/restapi"
+import {Construct} from "@aws-cdk/core"
 
 
 export interface S3IntegrationProps {
