@@ -34,7 +34,8 @@ class EventLog(Model):
     """Event processing log"""
 
     class Meta:
-        table_name = os.environ.get("EVENT_LOG_TABLE", f"event-log-{os.environ['AWS_REGION']}")
+        table_name = os.environ.get("EVENT_LOG_TABLE", f"event-log-{os.environ.get('AWS_REGION', 'eu-west-1')}")
+        region = os.environ.get("AWS_REGION", "eu-west-1")
 
     s3_key = UnicodeAttribute(hash_key=True)
     s3_bucket = UnicodeAttribute(attr_name="bucket")
