@@ -10,9 +10,9 @@ import {Bucket} from "@aws-cdk/aws-s3"
 const S3_EVENT_PATH = 's3-integration-event'
 
 
-function getBucketName(): string {
+function getBucketName(region: string): string {
     const user = process.env.USER?.toLowerCase() || Math.floor(Math.random() * 1000)
-    return `${user}-cdk-example-app-events`
+    return `${user}-cdk-example-app-events-${region}`
 }
 
 export class CdkExampleAppStack extends PythonStack {
@@ -24,7 +24,7 @@ export class CdkExampleAppStack extends PythonStack {
         const apiLambda = createPythonLambda(this, 'Api')
 
         const events_bucket = new Bucket(this, "EventsBucket", {
-            bucketName: getBucketName(),
+            bucketName: getBucketName(cdk.Stack.of(this).region),
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true
         })

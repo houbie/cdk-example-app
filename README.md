@@ -82,7 +82,7 @@ cd cdk
 npm i
 npm run build
 # when using an AWS profile, add '--profile your-profile' to the deploy command
-npx cdk deploy
+npx cdk deploy --all
 ```
 
 This will output the URL where you can access the API Gateway.

@@ -11,12 +11,15 @@ const DEFAULT_RUNTIME = Runtime.PYTHON_3_8
 
 
 function createPythonLambda(stack: PythonStack, name: string, options?: FunctionProps): Function {
+    let packageName = Stack.of(stack).stackName
+    packageName = snake(packageName.substr(0, packageName.indexOf('-')))
+
     const defaults: FunctionProps = {
         functionName: `${kebab(name)}-fn`,
         runtime: DEFAULT_RUNTIME,
         timeout: Duration.seconds(30),
         code: stack.createCodeAsset('src'),
-        handler: `${snake(Stack.of(stack).stackName)}.${snake(name)}_lambda.handler`,
+        handler: `${packageName}.${snake(name)}_lambda.handler`,
         layers: stack.lambdaLayers,
         environment: {
             LOG_LEVEL: 'INFO',
