@@ -28,7 +28,7 @@ def _disable_connexion_security():
 def create_app(
     name,
     specification,
-    specification_dir="../",
+    specification_dir="./",
     base_path=None,
     options=None,
     resolver=None,
