@@ -19,12 +19,13 @@ export class CdkExampleAppStack extends PythonStack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props)
 
-        const eventLogTable = createEventLogTable(this)
+        const region = cdk.Stack.of(this).region
+        const eventLogTable = createEventLogTable(this, region)
 
         const apiLambda = createPythonLambda(this, 'Api')
 
         const events_bucket = new Bucket(this, "EventsBucket", {
-            bucketName: getBucketName(cdk.Stack.of(this).region),
+            bucketName: getBucketName(region),
             removalPolicy: RemovalPolicy.DESTROY,
             autoDeleteObjects: true
         })
